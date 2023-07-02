@@ -14,7 +14,7 @@ crossbeam-queue = "0.3.8"
 red4ext-rs = { git = "https://github.com/jac3km4/red4ext-rs.git", rev = "fa184f9" }
 serde = { version = "1.0.164", features = ["derive"] }
 serde_json = "1.0.99"
-tokio = "1.29.1"
+tokio = { version = "1.29.1", features = ["full"] }
 
 [profile.release]
 lto = "thin"
