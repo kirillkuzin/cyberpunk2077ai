@@ -1,8 +1,10 @@
 # CyberAI
 
-Welcome to the CyberAI project! This is a plugin for Cyberpunk 2077, written in Rust, that enables integration between the videogame and OpenAI API, opening a world of possibilities for enhancing the gameplay experience.
+Welcome to the CyberAI project! This plugin for Cyberpunk 2077 enables integration between the videogame and OpenAI API, opening a world of possibilities for enhancing the gameplay experience. With this plugin, you can call OpenAI API methods directly from the scripting level.
 
 Plugin development is still in progress.
+
+![bg](bg.png)
 
 ## Installation
 
