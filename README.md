@@ -1,37 +1,56 @@
 # CyberAI
 
 Welcome to the CyberAI project! This is a plugin for Cyberpunk 2077, written in Rust, that enables integration between the videogame and OpenAI API, opening a world of possibilities for enhancing the gameplay experience.
-The CyberAI is designed to bridge the world of Cyberpunk 2077 and the power of OpenAI's AI technology.
+
+Plugin development is still in progress.
 
 ## Installation
 
-...
+1. Download a zip from the latest release
+2. Move CyberAI.dll and Settings.json to red4ext\plugins\CyberAI
+3. Open Settings.json and paste your OpenAI api key and organization id
 
 ## Usage
 
-...
+### Redscript
 
-## Examples
+```
+native func ChatCompletionRequest(messages: array<array<String>>) -> String;
+native func ScheduleChatCompletionRequest(messages: array<array<String>>);
+native func GetLastAnswerContent() -> String;
+native func GetSettings() -> String;
+```
 
-### Ideas
+### CET Console
+
+Send this line to the CET, and GPT will generate an answer for you:
+```
+LogChannel("DEBUG", ChatCompletionRequest({{"System", "You are very helpful assistant."}, {"User", "How are you?"}}));
+```
+But it will execute with visible lag. To avoid it, try this line:
+```
+ScheduleChatCompletionRequest({{"System", "You are very helpful assistant."}, {"User", "How are you?"}});
+```
+Then you can collect an answer when it is done:
+```
+LogChannel("DEBUG", GetLastAnswerContent());
+```
+
+## Inspiration
 
 With this plugin, the possibilities are almost limitless. Here are just a few examples of how you can use it:
 
-1. **AI-NPC Dialogue:** Use OpenAI's GPT to generate unique dialogue for non-player characters (NPCs), increasing the diversity and richness of in-game interactions.
+- **AI-NPC Dialogue:** Use OpenAI's GPT to generate unique dialogue for non-player characters (NPCs), increasing the diversity and richness of in-game interactions.
 
-2. **Dynamic Plot Generation:** Use OpenAI to generate unique storylines or side quests based on in-game events or player actions.
+- **Dynamic Plot Generation:** Use OpenAI to generate unique storylines or side quests based on in-game events or player actions.
 
-3. **Procedural Mission Planning:** Generate procedural missions based on context, NPC data, and player preferences using AI.
+- **Procedural Mission Planning:** Generate procedural missions based on context, NPC data, and player preferences using AI.
 
-4. **Interactive Environment**: Use AI to generate dynamic responses from the environment, making your exploration of Night City even more immersive.
+- **Interactive Environment**: Use AI to generate dynamic responses from the environment, making your exploration of Night City even more immersive.
 
-5. **Intelligent Enemy Tactics:** AI could control enemy tactics based on the player's strategy and actions, making combat more challenging and unpredictable.
+- **Intelligent Enemy Tactics:** AI could control enemy tactics based on the player's strategy and actions, making combat more challenging and unpredictable.
 
 Remember, these are just examples, and the only limit is your imagination!
-
-### Code
-
-...
 
 ## Dependencies
 
