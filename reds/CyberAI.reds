@@ -6,3 +6,6 @@ native func ScheduleChatCompletionRequest(messages: array<array<String>>);
 
 // LogChannel("DEBUG", GetLastAnswerContent());
 native func GetLastAnswerContent() -> String;
+
+// LogChannel("DEBUG", GetSettings());
+native func GetSettings() -> String;

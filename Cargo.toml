@@ -11,6 +11,7 @@ crate-type = ["cdylib"]
 [dependencies]
 async-openai = "0.12.1"
 crossbeam-queue = "0.3.8"
+lazy_static = "1.4.0"
 red4ext-rs = { git = "https://github.com/jac3km4/red4ext-rs.git", rev = "fa184f9" }
 serde = { version = "1.0.164", features = ["derive"] }
 serde_json = "1.0.99"
