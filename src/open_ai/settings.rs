@@ -5,7 +5,6 @@ use std::path::PathBuf;
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 
-
 #[derive(Deserialize, Serialize)]
 pub struct Settings {
     api_key: String,
@@ -48,7 +47,6 @@ impl Settings {
         self.max_tokens
     }
 }
-
 
 struct GlobalSettings {
     pub settings: Settings,

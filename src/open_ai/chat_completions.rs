@@ -1,9 +1,4 @@
-use crate::open_ai::core::{
-    Chat,
-    ChatStorage,
-    ChatCompletionParameters,
-    CHAT_STORAGE,
-};
+use crate::open_ai::core::{Chat, ChatCompletionParameters, ChatStorage, CHAT_STORAGE};
 use crate::open_ai::settings::SETTINGS;
 
 use std::{error::Error, vec};
@@ -17,7 +12,6 @@ use async_openai::{
     Client,
 };
 use tokio::runtime::Runtime;
-
 
 pub fn get_last_answer_content(chat_id: String) -> String {
     let chat_storage: &ChatStorage = &CHAT_STORAGE.chat_storage;
@@ -41,12 +35,14 @@ pub fn schedule_chat_completion_request(chat_id: String, message: String) {
         let history = chat.get_history();
 
         let _result = wrapped_chat_completion_request(history);
-        
+
         chat.add_answer(_result);
     });
 }
 
-async fn chat_completion_request(history: Vec<ChatCompletionParameters>) -> Result<String, Box<dyn Error>> {
+async fn chat_completion_request(
+    history: Vec<ChatCompletionParameters>,
+) -> Result<String, Box<dyn Error>> {
     let settings = &SETTINGS.settings;
 
     let api_key = settings.get_api_key();

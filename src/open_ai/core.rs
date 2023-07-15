@@ -1,9 +1,8 @@
 use std::collections::HashMap;
 
 use async_openai::types::Role;
-use lazy_static::lazy_static;
 use crossbeam_queue::SegQueue;
-
+use lazy_static::lazy_static;
 
 pub struct ChatCompletionParameters {
     pub role: Role,
@@ -38,7 +37,6 @@ impl Clone for ChatCompletionParameters {
         }
     }
 }
-
 
 pub struct Chat {
     pub id: String,
@@ -76,7 +74,6 @@ impl Chat {
     }
 }
 
-
 pub struct ChatStorage {
     chats: HashMap<String, Chat>,
 }
@@ -92,7 +89,6 @@ impl ChatStorage {
         self.chats.entry(chat_id.to_string()).or_insert(Chat::new())
     }
 }
-
 
 struct GlobalChatStorage {
     pub chat_storage: ChatStorage,
