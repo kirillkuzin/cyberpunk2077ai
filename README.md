@@ -7,11 +7,10 @@ Plugin development is still in progress.
 ![bg](bg.png)
 
 ## Installation
-
-1. Download a zip from the latest release
+1. Download the zip from the latest release
 2. Move CyberAI.dll and Settings.json to red4ext\plugins\CyberAI
-3. Open Settings.json and paste your OpenAI api key and organization id
-4. If you would access to plugin's functions from CET console, you need to move CyberAI.reds to r6\scripts\CyberAI
+3. Open Settings.json and paste your OpenAI API key and organization id
+4. If you would access to the plugin's functions from CET console, you need to move CyberAI.reds to r6\scripts\CyberAI
 
 ## Usage
 
@@ -35,7 +34,7 @@ LogChannel(n"DEBUG", GetAnswer("your_custom_id"));
 LogChannel(n"DEBUG", GetRequest("your_custom_id"));
 ```
 
-You can iterate through the chat history or you can get it as a string:
+You can iterate through the chat history, or you can get it as a string:
 ```
 native func GetHistory(chat_id: String) -> array<array<String>>;
 native func GetHistoryAsString(chat_id: String) -> String;
@@ -57,7 +56,7 @@ FlushChat("your_custom_id");
 
 You need to put your generated custom string ID in almost all functions. CyberAI will provide a new chat for every unique ID and keep the chat history. 
 
-<b>Whenever you request to the chat, all the chat history also sends to OpenAI API.</b>
+<b>Whenever you request to chat, all the chat history also sends to OpenAI API.</b>
 
 ## Inspiration
 
