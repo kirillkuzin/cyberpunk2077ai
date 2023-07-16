@@ -96,6 +96,12 @@ impl Chat {
     fn get_history(&self) -> Vec<ChatCompletionParameters> {
         self.history.clone()
     }
+
+    fn flush(&mut self) {
+        self.answers = SegQueue::new();
+        self.requests = SegQueue::new();
+        self.history.clear();
+    }
 }
 
 struct ChatStorage {
@@ -159,6 +165,15 @@ pub fn get_full_chat_history(chat_id: &str) -> Vec<ChatCompletionParameters> {
     with_chat(chat_id, |chat| chat.get_history())
 }
 
+pub fn get_iterable_chat_history(chat_id: &str) -> Vec<Vec<String>> {
+    let history = get_full_chat_history(chat_id);
+    let mut result = vec![];
+    for entry in history {
+        result.push(entry.into());
+    }
+    result
+}
+
 pub fn get_printable_chat_history(chat_id: &str) -> String {
     let history = get_full_chat_history(chat_id);
     let mut result = String::new();
@@ -166,6 +181,10 @@ pub fn get_printable_chat_history(chat_id: &str) -> String {
         result.push_str(&format!("{}: {}\n", entry.role, entry.content));
     }
     result
+}
+
+pub fn flush_chat(chat_id: &str) {
+    with_chat(chat_id, |chat| chat.flush());
 }
 
 #[cfg(test)]
@@ -207,5 +226,57 @@ mod tests {
         assert_eq!(history[0].content, request);
         assert_eq!(history[1].role, Role::Assistant);
         assert_eq!(history[1].content, answer);
+    }
+
+    #[test]
+    fn test_get_iterable_chat_history() {
+        let chat_id = "test_chat_iterable";
+        let request = "Hello, world!";
+        let answer = "Hello, user!";
+        append_to_chat_history(chat_id, Role::User, request.to_string());
+        append_to_chat_history(chat_id, Role::Assistant, answer.to_string());
+
+        let history = get_iterable_chat_history(chat_id);
+        assert_eq!(history.len(), 2);
+        assert_eq!(history[0], vec!["User", request]);
+        assert_eq!(history[1], vec!["Assistant", answer]);
+    }
+
+    #[test]
+    fn test_get_printable_chat_history() {
+        let chat_id = "test_chat_printable";
+        let request = "Hello, world!";
+        let answer = "Hello, user!";
+        append_to_chat_history(chat_id, Role::User, request.to_string());
+        append_to_chat_history(chat_id, Role::Assistant, answer.to_string());
+
+        let history = get_printable_chat_history(chat_id);
+        let expected = format!(
+            "{}: {}\n{}: {}\n",
+            Role::User,
+            request,
+            Role::Assistant,
+            answer
+        );
+        assert_eq!(history, expected);
+    }
+
+    #[test]
+    fn test_flush_chat() {
+        let chat_id = "test_chat_flush";
+        let request = "Hello, world!";
+        let answer = "Hello, user!";
+        append_to_chat_history(chat_id, Role::User, request.to_string());
+        append_to_chat_history(chat_id, Role::Assistant, answer.to_string());
+
+        flush_chat(chat_id);
+        let history = get_full_chat_history(chat_id);
+        assert!(history.is_empty());
+
+        let request_content = get_request_from_chat(chat_id);
+        assert!(request_content.is_empty());
+
+        let answer_content = get_answer_from_chat(chat_id);
+        assert!(answer_content.is_empty());
     }
 }

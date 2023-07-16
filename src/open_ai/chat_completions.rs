@@ -1,7 +1,7 @@
 use crate::open_ai::core::{
-    append_answer_to_chat, append_request_to_chat, append_to_chat_history, get_answer_from_chat,
-    get_full_chat_history, get_printable_chat_history, get_request_from_chat,
-    ChatCompletionParameters,
+    append_answer_to_chat, append_request_to_chat, append_to_chat_history, flush_chat,
+    get_answer_from_chat, get_full_chat_history, get_iterable_chat_history,
+    get_printable_chat_history, get_request_from_chat, ChatCompletionParameters,
 };
 use crate::open_ai::settings::SETTINGS;
 
@@ -25,8 +25,16 @@ pub fn get_request_content(chat_id: String) -> String {
     get_request_from_chat(&chat_id)
 }
 
+pub fn get_history(chat_id: String) -> Vec<Vec<String>> {
+    get_iterable_chat_history(&chat_id)
+}
+
 pub fn get_history_as_string(chat_id: String) -> String {
     get_printable_chat_history(&chat_id)
+}
+
+pub fn flush(chat_id: String) {
+    flush_chat(&chat_id);
 }
 
 fn wrapped_chat_completion_request(history: Vec<ChatCompletionParameters>) -> String {
