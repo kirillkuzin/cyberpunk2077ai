@@ -11,32 +11,53 @@ Plugin development is still in progress.
 1. Download a zip from the latest release
 2. Move CyberAI.dll and Settings.json to red4ext\plugins\CyberAI
 3. Open Settings.json and paste your OpenAI api key and organization id
+4. If you would access to plugin's functions from CET console, you need to move CyberAI.reds to r6\scripts\CyberAI
 
 ## Usage
 
 ### Redscript
 
+Ask GPT to generate an answer for you:
 ```
-native func ChatCompletionRequest(messages: array<array<String>>) -> String;
-native func ScheduleChatCompletionRequest(messages: array<array<String>>);
-native func GetLastAnswerContent() -> String;
-native func GetSettings() -> String;
+native func ScheduleChatCompletionRequest(chat_id: String, messages: array<array<String>>);
+
+ScheduleChatCompletionRequest("your_custom_id", {{"System", "Speak as ..."}, {"User", "How are you?"}});
+
+ScheduleChatCompletionRequest("your_custom_id", {{"User", "My name is V"}, {"User", "How are you and what's my name?"}});
 ```
 
-### CET Console
+You can collect your request and an answer when it is done:
+```
+native func GetAnswer(chat_id: String) -> String;
+native func GetRequest(chat_id: String) -> String;
 
-Send this line to the CET, and GPT will generate an answer for you:
+LogChannel(n"DEBUG", GetAnswer("your_custom_id"));
+LogChannel(n"DEBUG", GetRequest("your_custom_id"));
 ```
-LogChannel("DEBUG", ChatCompletionRequest({{"System", "You are very helpful assistant."}, {"User", "How are you?"}}));
+
+You can iterate through the chat history or you can get it as a string:
 ```
-But it will execute with visible lag. To avoid it, try this line:
+native func GetHistory(chat_id: String) -> array<array<String>>;
+native func GetHistoryAsString(chat_id: String) -> String;
+
+LogChannel(n"DEBUG", GetHistoryAsString("your_custom_id"));
+
+let history = GetHistory(chat_id);
+for completion in history {
+    LogChannel(n"DEBUG", "Role: " + ToString(completion[0]) + "\nMessage: " + ToString(completion[1]));
+}
 ```
-ScheduleChatCompletionRequest({{"System", "You are very helpful assistant."}, {"User", "How are you?"}});
+
+Flushing a chat:
 ```
-Then you can collect an answer when it is done:
+native func FlushChat(chat_id: String);
+
+FlushChat("your_custom_id");
 ```
-LogChannel("DEBUG", GetLastAnswerContent());
-```
+
+You need to put your generated custom string ID in almost all functions. CyberAI will provide a new chat for every unique ID and keep the chat history. 
+
+<b>Whenever you request to the chat, all the chat history also sends to OpenAI API.</b>
 
 ## Inspiration
 
