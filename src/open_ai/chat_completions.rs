@@ -1,4 +1,8 @@
-use crate::open_ai::core::{Chat, ChatCompletionParameters, ChatStorage, CHAT_STORAGE};
+use crate::open_ai::core::{
+    append_answer_to_chat, append_request_to_chat, append_to_chat_history, get_answer_from_chat,
+    get_full_chat_history, get_printable_chat_history, get_request_from_chat,
+    ChatCompletionParameters,
+};
 use crate::open_ai::settings::SETTINGS;
 
 use std::{error::Error, vec};
@@ -7,16 +11,22 @@ use async_openai::{
     config::OpenAIConfig,
     types::{
         ChatCompletionRequestMessageArgs, CreateChatCompletionRequest,
-        CreateChatCompletionRequestArgs,
+        CreateChatCompletionRequestArgs, Role,
     },
     Client,
 };
 use tokio::runtime::Runtime;
 
-pub fn get_last_answer_content(chat_id: String) -> String {
-    let chat_storage: &ChatStorage = &CHAT_STORAGE.chat_storage;
-    let chat: &Chat = chat_storage.get_or_create_chat(&chat_id);
-    chat.get_last_answer_content()
+pub fn get_answer_content(chat_id: String) -> String {
+    get_answer_from_chat(&chat_id)
+}
+
+pub fn get_request_content(chat_id: String) -> String {
+    get_request_from_chat(&chat_id)
+}
+
+pub fn get_history_as_string(chat_id: String) -> String {
+    get_printable_chat_history(&chat_id)
 }
 
 fn wrapped_chat_completion_request(history: Vec<ChatCompletionParameters>) -> String {
@@ -28,20 +38,31 @@ fn wrapped_chat_completion_request(history: Vec<ChatCompletionParameters>) -> St
     _result
 }
 
-pub fn schedule_chat_completion_request(chat_id: String, message: String) {
+pub fn schedule_chat_completion_request(chat_id: String, messages: Vec<Vec<String>>) {
     std::thread::spawn(move || {
-        let chat_storage: &ChatStorage = &CHAT_STORAGE.chat_storage;
-        let chat: &Chat = chat_storage.get_or_create_chat(chat_id.as_str());
-        let history = chat.get_history();
+        for message in messages.iter() {
+            append_request_to_chat(&chat_id, message[1].clone());
 
-        let _result = wrapped_chat_completion_request(history);
+            let role: Role = match message[0].as_str() {
+                "User" => Role::User,
+                "System" => Role::System,
+                "Assistant" => Role::Assistant,
+                _ => Role::User,
+            };
+            append_to_chat_history(&chat_id, role, message[1].clone());
+        }
 
-        chat.add_answer(_result);
+        let history = get_full_chat_history(&chat_id);
+
+        let _result: String = wrapped_chat_completion_request(history);
+
+        append_answer_to_chat(&chat_id, _result.clone());
+        append_to_chat_history(&chat_id, Role::Assistant, _result.clone());
     });
 }
 
 async fn chat_completion_request(
-    history: Vec<ChatCompletionParameters>,
+    messages: Vec<ChatCompletionParameters>,
 ) -> Result<String, Box<dyn Error>> {
     let settings = &SETTINGS.settings;
 
@@ -53,8 +74,7 @@ async fn chat_completion_request(
         .with_org_id(org_id);
     let client = Client::with_config(config);
 
-    // let messages = build_chat_completion_request_message_args(messages)?;
-    let request = build_chat_completion_request(history)?;
+    let request = build_chat_completion_request(messages)?;
 
     let response = client.chat().create(request).await?;
 
@@ -67,20 +87,8 @@ async fn chat_completion_request(
     Ok(choice)
 }
 
-fn build_chat_completion_request_message_args(
-    messages: Vec<Vec<String>>,
-) -> Result<Vec<ChatCompletionParameters>, Box<dyn Error>> {
-    let mut chat_completion_request_message_args = vec![];
-    for message in messages {
-        let chat_completion_params: ChatCompletionParameters = message.into();
-        chat_completion_request_message_args.push(chat_completion_params);
-    }
-
-    Ok(chat_completion_request_message_args)
-}
-
 fn build_chat_completion_request(
-    history: Vec<ChatCompletionParameters>,
+    messages: Vec<ChatCompletionParameters>,
 ) -> Result<CreateChatCompletionRequest, Box<dyn Error>> {
     let settings = &SETTINGS.settings;
 
@@ -88,7 +96,7 @@ fn build_chat_completion_request(
     let max_tokens = settings.get_max_tokens();
 
     let mut chat_completion_request_message_args = vec![];
-    for message in history {
+    for message in messages {
         chat_completion_request_message_args.push(
             ChatCompletionRequestMessageArgs::default()
                 .role(message.role)

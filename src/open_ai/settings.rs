@@ -31,16 +31,16 @@ impl Default for Settings {
 }
 
 impl Settings {
-    pub fn get_api_key(&self) -> String {
-        self.api_key.clone()
+    pub fn get_api_key(&self) -> &str {
+        &self.api_key
     }
 
-    pub fn get_org_id(&self) -> String {
-        self.org_id.clone()
+    pub fn get_org_id(&self) -> &str {
+        &self.org_id
     }
 
-    pub fn get_model(&self) -> String {
-        self.model.clone()
+    pub fn get_model(&self) -> &str {
+        &self.model
     }
 
     pub fn get_max_tokens(&self) -> u16 {
@@ -48,7 +48,7 @@ impl Settings {
     }
 }
 
-struct GlobalSettings {
+pub struct GlobalSettings {
     pub settings: Settings,
 }
 

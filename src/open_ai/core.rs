@@ -1,4 +1,7 @@
-use std::collections::HashMap;
+use std::{
+    collections::HashMap,
+    sync::{Mutex, MutexGuard},
+};
 
 use async_openai::types::Role;
 use crossbeam_queue::SegQueue;
@@ -29,6 +32,19 @@ impl Into<ChatCompletionParameters> for Vec<String> {
     }
 }
 
+impl Into<Vec<String>> for ChatCompletionParameters {
+    fn into(self) -> Vec<String> {
+        let role = match self.role {
+            Role::System => "System",
+            Role::User => "User",
+            Role::Assistant => "Assistant",
+            Role::Function => "Function",
+        };
+
+        vec![role.to_string(), self.content]
+    }
+}
+
 impl Clone for ChatCompletionParameters {
     fn clone(&self) -> ChatCompletionParameters {
         ChatCompletionParameters {
@@ -38,30 +54,38 @@ impl Clone for ChatCompletionParameters {
     }
 }
 
-pub struct Chat {
-    pub id: String,
+struct Chat {
     answers: SegQueue<String>,
+    requests: SegQueue<String>,
     history: Vec<ChatCompletionParameters>,
 }
 
 impl Chat {
     fn new() -> Self {
         Chat {
-            id: "default".to_string(), // TODO: generate unique id for each chat
             answers: SegQueue::new(),
+            requests: SegQueue::new(),
             history: Vec::new(),
         }
     }
 
-    pub fn get_last_answer_content(&self) -> String {
-        self.answers.pop().unwrap_or_default()
+    fn add_request(&self, request: String) {
+        self.requests.push(request);
     }
 
-    pub fn add_answer(&self, answer: String) {
+    fn get_request_content(&self) -> String {
+        self.requests.pop().unwrap_or_default()
+    }
+
+    fn add_answer(&self, answer: String) {
         self.answers.push(answer);
     }
 
-    pub fn add_history(&mut self, role: Role, message: String) {
+    fn get_answer_content(&self) -> String {
+        self.answers.pop().unwrap_or_default()
+    }
+
+    fn add_history(&mut self, role: Role, message: String) {
         let history_entry = ChatCompletionParameters {
             role,
             content: message,
@@ -69,33 +93,119 @@ impl Chat {
         self.history.push(history_entry);
     }
 
-    pub fn get_history(&self) -> Vec<ChatCompletionParameters> {
+    fn get_history(&self) -> Vec<ChatCompletionParameters> {
         self.history.clone()
     }
 }
 
-pub struct ChatStorage {
+struct ChatStorage {
     chats: HashMap<String, Chat>,
 }
 
 impl ChatStorage {
-    pub fn new() -> Self {
+    fn new() -> Self {
         ChatStorage {
             chats: HashMap::new(),
         }
     }
 
-    pub fn get_or_create_chat(&mut self, chat_id: &str) -> &Chat {
+    fn get_or_create_chat(&mut self, chat_id: &str) -> &mut Chat {
         self.chats.entry(chat_id.to_string()).or_insert(Chat::new())
     }
 }
 
 struct GlobalChatStorage {
-    pub chat_storage: ChatStorage,
+    chat_storage: ChatStorage,
 }
 
 lazy_static! {
-    pub static ref CHAT_STORAGE: GlobalChatStorage = GlobalChatStorage {
+    static ref CHAT_STORAGE: Mutex<GlobalChatStorage> = Mutex::new(GlobalChatStorage {
         chat_storage: ChatStorage::new(),
-    };
+    });
+}
+
+fn with_chat<F, R>(chat_id: &str, f: F) -> R
+where
+    F: FnOnce(&mut Chat) -> R,
+{
+    let mut chat_storage_guard: MutexGuard<GlobalChatStorage> = CHAT_STORAGE.lock().unwrap();
+    let chat_storage = &mut chat_storage_guard.chat_storage;
+    let chat = chat_storage.get_or_create_chat(chat_id);
+
+    f(chat)
+}
+
+pub fn append_request_to_chat(chat_id: &str, request: String) {
+    with_chat(chat_id, |chat| chat.add_request(request));
+}
+
+pub fn get_request_from_chat(chat_id: &str) -> String {
+    with_chat(chat_id, |chat| chat.get_request_content())
+}
+
+pub fn append_answer_to_chat(chat_id: &str, answer: String) {
+    with_chat(chat_id, |chat| chat.add_answer(answer));
+}
+
+pub fn get_answer_from_chat(chat_id: &str) -> String {
+    with_chat(chat_id, |chat| chat.get_answer_content())
+}
+
+pub fn append_to_chat_history(chat_id: &str, role: Role, message: String) {
+    with_chat(chat_id, |chat| chat.add_history(role, message));
+}
+
+pub fn get_full_chat_history(chat_id: &str) -> Vec<ChatCompletionParameters> {
+    with_chat(chat_id, |chat| chat.get_history())
+}
+
+pub fn get_printable_chat_history(chat_id: &str) -> String {
+    let history = get_full_chat_history(chat_id);
+    let mut result = String::new();
+    for entry in history {
+        result.push_str(&format!("{}: {}\n", entry.role, entry.content));
+    }
+    result
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use async_openai::types::Role;
+
+    #[test]
+    fn test_append_and_get_request() {
+        let chat_id = "test_chat";
+        let request = "Hello, world!";
+        append_request_to_chat(chat_id, request.to_string());
+
+        let result = get_request_from_chat(chat_id);
+        assert_eq!(result, request);
+    }
+
+    #[test]
+    fn test_append_and_get_answer() {
+        let chat_id = "test_chat";
+        let answer = "Hello, user!";
+        append_answer_to_chat(chat_id, answer.to_string());
+
+        let result = get_answer_from_chat(chat_id);
+        assert_eq!(result, answer);
+    }
+
+    #[test]
+    fn test_append_and_get_chat_history() {
+        let chat_id = "test_chat";
+        let request = "Hello, world!";
+        let answer = "Hello, user!";
+        append_to_chat_history(chat_id, Role::User, request.to_string());
+        append_to_chat_history(chat_id, Role::Assistant, answer.to_string());
+
+        let history = get_full_chat_history(chat_id);
+        assert_eq!(history.len(), 2);
+        assert_eq!(history[0].role, Role::User);
+        assert_eq!(history[0].content, request);
+        assert_eq!(history[1].role, Role::Assistant);
+        assert_eq!(history[1].content, answer);
+    }
 }

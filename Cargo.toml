@@ -1,6 +1,6 @@
 [package]
-name = "CyberAI"
-version = "0.0.1"
+name = "cyber_ai"
+version = "0.0.2"
 rust-version = "1.69"
 edition = "2021"
 license = "MIT"
@@ -15,7 +15,7 @@ lazy_static = "1.4.0"
 red4ext-rs = { git = "https://github.com/jac3km4/red4ext-rs.git", rev = "fa184f9" }
 serde = { version = "1.0.164", features = ["derive"] }
 serde_json = "1.0.99"
-tokio = { version = "1.29.1", features = ["full"] }
+tokio = { version = "1.29.1", features = ["rt-multi-thread"] }
 
 [profile.release]
 lto = "thin"
