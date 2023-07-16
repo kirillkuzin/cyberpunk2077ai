@@ -1,7 +1,5 @@
 # CyberAI
 
-[![GitHub license](https://badgen.net/github/license/Naereen/Strapdown.js)](https://github.com/Naereen/StrapDown.js/blob/master/LICENSE) [![Latest release](https://badgen.net/github/release/Naereen/Strapdown.js)](https://github.com/Naereen/Strapdown.js/releases) [![GitHub watchers](https://badgen.net/github/watchers/Naereen/Strapdown.js/)](https://GitHub.com/Naereen/StrapDown.js/watchers/) [![GitHub stars](https://badgen.net/github/stars/Naereen/Strapdown.js)](https://GitHub.com/Naereen/StrapDown.js/stargazers/)
-
 :robot: Welcome to the CyberAI project! This plugin for Cyberpunk 2077 enables integration between the videogame and OpenAI API, opening a world of possibilities for enhancing the gameplay experience. With this plugin, you can call OpenAI API methods directly from the scripting level.
 
 Plugin development is still in progress. :construction:
