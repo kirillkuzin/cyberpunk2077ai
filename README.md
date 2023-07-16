@@ -1,18 +1,21 @@
 # CyberAI
 
-Welcome to the CyberAI project! This plugin for Cyberpunk 2077 enables integration between the videogame and OpenAI API, opening a world of possibilities for enhancing the gameplay experience. With this plugin, you can call OpenAI API methods directly from the scripting level.
+[![GitHub license](https://badgen.net/github/license/Naereen/Strapdown.js)](https://github.com/Naereen/StrapDown.js/blob/master/LICENSE) [![Latest release](https://badgen.net/github/release/Naereen/Strapdown.js)](https://github.com/Naereen/Strapdown.js/releases) [![GitHub watchers](https://badgen.net/github/watchers/Naereen/Strapdown.js/)](https://GitHub.com/Naereen/StrapDown.js/watchers/) [![GitHub stars](https://badgen.net/github/stars/Naereen/Strapdown.js)](https://GitHub.com/Naereen/StrapDown.js/stargazers/)
 
-Plugin development is still in progress.
+:robot: Welcome to the CyberAI project! This plugin for Cyberpunk 2077 enables integration between the videogame and OpenAI API, opening a world of possibilities for enhancing the gameplay experience. With this plugin, you can call OpenAI API methods directly from the scripting level.
+
+Plugin development is still in progress. :construction:
 
 ![bg](bg.png)
 
-## Installation
+## Installation :wrench:
+
 1. Download the zip from the latest release
 2. Move CyberAI.dll and Settings.json to red4ext\plugins\CyberAI
 3. Open Settings.json and paste your OpenAI API key and organization id
 4. If you would access to the plugin's functions from CET console, you need to move CyberAI.reds to r6\scripts\CyberAI
 
-## Usage
+## Usage :computer:
 
 ### Redscript
 
@@ -56,11 +59,17 @@ FlushChat("your_custom_id");
 
 You need to put your generated custom string ID in almost all functions. CyberAI will provide a new chat for every unique ID and keep the chat history. 
 
-<b>Whenever you request to chat, all the chat history also sends to OpenAI API.</b>
+:warning: <b>Whenever you request to chat, all the chat history also sends to OpenAI API.</b>
 
-## Inspiration
+## Future Plans :rocket:
 
-With this plugin, the possibilities are almost limitless. Here are just a few examples of how you can use it:
+- **Eleven Labs Integration:** We plan to integrate with Eleven Labs to provide text-to-speech functionality, allowing the AI to generate audio responses in addition to text.
+
+- **InWorld AI Integration:** We are exploring the possibility of integrating with InWorld AI, a powerful AI engine for creating characters. This could allow for even more dynamic and responsive AI characters in the game.
+
+## Inspiration :bulb:
+
+With this plugin, the possibilities are almost limitless. Here are just a few examples of what you can script with it:
 
 - **AI-NPC Dialogue:** Use OpenAI's GPT to generate unique dialogue for non-player characters (NPCs), increasing the diversity and richness of in-game interactions.
 
@@ -74,9 +83,9 @@ With this plugin, the possibilities are almost limitless. Here are just a few ex
 
 Remember, these are just examples, and the only limit is your imagination!
 
-## Dependencies
+## Credits :link:
 
-This project would not be possible without the following dependencies:
+This project would not be possible without the following projects:
 
 - [red4ext-rs](https://github.com/jac3km4/red4ext-rs): A Rust binding for RED4ext, which provides an API to interact with the internals of Cyberpunk 2077.
 
@@ -84,10 +93,10 @@ This project would not be possible without the following dependencies:
 
 - [OpenAI API](https://openai.com/blog/openai-api): OpenAI offers a general-purpose "text in, text out" interface, making it possible to use language models like GPT-3 in a wide range of applications.
 
-## License
+## License :bookmark:
 
 This project is licensed under the terms of the MIT License. See the LICENSE file in the project's root directory for more details.
 
-Enjoy exploring the new world of Cyberpunk 2077 with the power of AI!
+Enjoy exploring the new world of Cyberpunk 2077 with the power of AI! :video_game: :joystick:
 
 ---
