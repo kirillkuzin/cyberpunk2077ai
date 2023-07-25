@@ -74,10 +74,12 @@ async fn chat_completion_request(
 ) -> Result<String, Box<dyn Error>> {
     let settings = &SETTINGS.settings;
 
+    let api_base = settings.get_api_base();
     let api_key = settings.get_api_key();
     let org_id = settings.get_org_id();
 
     let config = OpenAIConfig::new()
+        .with_api_base(api_base)
         .with_api_key(api_key)
         .with_org_id(org_id);
     let client = Client::with_config(config);

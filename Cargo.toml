@@ -1,6 +1,6 @@
 [package]
 name = "cyber_ai"
-version = "0.0.2"
+version = "0.1.0"
 rust-version = "1.69"
 edition = "2021"
 license = "MIT"
@@ -9,7 +9,7 @@ license = "MIT"
 crate-type = ["cdylib"]
 
 [dependencies]
-async-openai = "0.12.1"
+async-openai = { git = "https://github.com/kirillkuzin/async-openai.git", rev = "762444e" }
 crossbeam-queue = "0.3.8"
 lazy_static = "1.4.0"
 red4ext-rs = { git = "https://github.com/jac3km4/red4ext-rs.git", rev = "fa184f9" }

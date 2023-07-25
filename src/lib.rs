@@ -5,7 +5,7 @@ use red4ext_rs::prelude::*;
 define_plugin! {
     name: "CyberAI",
     author: "author",
-    version: 0:0:2,
+    version: 0:1:0,
     on_register: {
         register_function!("ScheduleChatCompletionRequest", open_ai::chat_completions::schedule_chat_completion_request);
         register_function!("GetAnswer", open_ai::chat_completions::get_answer_content);

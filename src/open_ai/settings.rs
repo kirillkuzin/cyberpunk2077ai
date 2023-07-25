@@ -7,21 +7,17 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize)]
 pub struct Settings {
+    api_base: String,
     api_key: String,
     org_id: String,
     model: String,
     max_tokens: u16,
 }
 
-impl Into<String> for &Settings {
-    fn into(self) -> String {
-        serde_json::to_string(self).expect("Failed to serialize JSON")
-    }
-}
-
 impl Default for Settings {
     fn default() -> Self {
         Settings {
+            api_base: "https://api.openai.com/v1".to_string(),
             api_key: String::new(),
             org_id: String::new(),
             model: "gpt-3.5-turbo".to_string(),
@@ -31,6 +27,10 @@ impl Default for Settings {
 }
 
 impl Settings {
+    pub fn get_api_base(&self) -> &str {
+        &self.api_base
+    }
+
     pub fn get_api_key(&self) -> &str {
         &self.api_key
     }
@@ -79,5 +79,10 @@ lazy_static! {
 pub fn get_settings() -> String {
     let settings: &Settings = &SETTINGS.settings;
 
-    settings.into()
+    let settings_text = format!("api_base: {}\n", settings.get_api_base())
+        + &format!("api_key: {}\n", settings.get_api_key())
+        + &format!("org_id: {}\n", settings.get_org_id())
+        + &format!("model: {}\n", settings.get_model())
+        + &format!("max_tokens: {}\n", settings.get_max_tokens());
+    settings_text
 }
